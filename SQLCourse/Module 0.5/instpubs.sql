@@ -2166,6 +2166,11 @@ SET COMPATIBILITY_LEVEL = 110
 
 GO
 
+ALTER DATABASE Adventureworks2012DW
+SET COMPATIBILITY_LEVEL = 110
+
+GO
+
 declare @dttm varchar(55)
 select  @dttm=convert(varchar,getdate(),113)
 raiserror('Ending InstPubs.SQL at %s ....',1,1,@dttm) with nowait

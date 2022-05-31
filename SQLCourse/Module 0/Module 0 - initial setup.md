@@ -15,5 +15,17 @@ The course will demand the SQL Server installed locally on the attendees compute
 ### Restore AdventureWorks database
 To work with a good solid database, we need to use the AdventureWorks database version 2012.
 
-1. Download the MDF file [from this link](https://1drv.ms/u/s!At3A8qRpe484gYYtrfQ8UzLEVFBk5A?e=PLsS6a)
+1. Download the MDF file [from this link](https://www.dropbox.com/s/o2v5ay0183loke7/AdventureWorks2012_Data.mdf?dl=0)
 2. Restore the database in your installed SQL server
+
+### Restore AdventureWorksDW database
+To work with a good solid database, we need to use the AdventureWorksDW database version 2012.
+
+1. Download the MDF file [from this link](https://www.dropbox.com/s/18fyr76g468uzjo/AdventureWorksDW2012_Data.mdf?dl=0)
+2. Restore the database in your installed SQL server
+
+### Install CREDIT database
+
+1. Download this [zip file](https://www.dropbox.com/s/hejhv44i89urtat/Credit%20DB.zip?dl=0)
+2. Unzip the file
+3. Access the folder and start the install.bat
