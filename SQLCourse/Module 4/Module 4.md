@@ -356,9 +356,16 @@ Splitting at the high end adds a new partition, but no rows are moved and no exi
 
 However, you must make sure there is a new filegroup to hold the new partition
 
+Below query does not work:
+
 ```sql
 ALTER PARTITION FUNCTION test_fn() SPLIT RANGE(50);
 GO
+```
+
+But after you change the partition scheme, it will:
+
+```sql
 ALTER PARTITION SCHEME test_ps
 NEXT USED [PRIMARY];
 GO
