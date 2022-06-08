@@ -429,8 +429,11 @@ UPDATE Products SET ZoomLength='12x' WHERE Id=1003;
 SELECT Id, Type, ProductProperties 
 FROM Products WHERE Id=1003
 GO
+```
 
 INSERT PRODUCTS USING COLUMN_SET xml
+
+```sql
 INSERT INTO Products(Id, Type, ProductProperties) VALUES 
 (1004, 'Camera', '<ZoomLength>10x</ZoomLength><Resolution>10 mb</Resolution>'),
 (2050, 'Trousers', '<WaistSize>38</WaistSize><Inseam>32</Inseam>')
