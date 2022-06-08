@@ -816,7 +816,7 @@ Look for one particular object in the AW database
 
 ```sql
 SELECT object_name(object_id) as Object, *
-FROM sys.dm_db_index_physical_stats (DB_ID(N'AdventureWorks2012'), object_id('DatabaseLog'),  null, null,  'DETAILED');
+FROM sys.dm_db_index_physical_stats (DB_ID(N'AdventureWorks2012'), object_id('DatabaseLog'),  null, null,  'DETAILED')
 where index_type_desc = 'heap';
 ```
 
