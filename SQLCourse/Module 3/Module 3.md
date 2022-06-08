@@ -56,6 +56,24 @@ DBCC LOGINFO;
 Before running this next part, be sure to run the script to create a table to store the results of DBCC LOGINFO
 
 ```sql
+USE master;
+GO
+IF object_id('sp_LOGINFO') IS NOT NULL
+	DROP TABLE sp_loginfo;
+GO
+CREATE TABLE sp_LOGINFO 
+(RecoveryUnitId int,
+ FileId tinyint,
+ FileSize bigint, 
+ StartOffset bigint,
+ FSeqNo int,
+ Status tinyint,
+ Parity tinyint,
+ CreateLSN numeric(25,0) );
+GO
+```
+
+```sql
 TRUNCATE TABLE sp_LOGINFO;
 INSERT INTO sp_LOGINFO
    EXEC ('DBCC LOGINFO');
