@@ -477,6 +477,23 @@ Create a view to return details about a partitioned table or index
 
 First run the script to create the function index_name()
 
+```sql 
+IF OBJECT_ID('dbo.index_name') IS NOT NULL
+	DROP FUNCTION dbo.index_name;
+GO
+
+CREATE FUNCTION dbo.index_name (@object_id int, @index_id smallint)
+RETURNS sysname
+AS
+BEGIN
+  DECLARE @index_name sysname
+  SELECT @index_name = name FROM sys.indexes
+     WHERE object_id = @object_id and index_id = @index_id
+  RETURN(@index_name)
+END;
+```
+
+
 ```sql
 IF EXISTS (SELECT * FROM sys.views WHERE name = 'Partition_Info')
     DROP VIEW partition_info;
