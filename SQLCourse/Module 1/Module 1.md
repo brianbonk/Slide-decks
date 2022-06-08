@@ -434,6 +434,7 @@ SELECT * FROM sys.sysrowsets;
 ```
 
 Connect using the DAC by prefacing your server name with ADMIN:
+Example (admin:servername) - through creating a new connection
 
 ```sql
 SELECT * FROM sys.sysrowsets;
