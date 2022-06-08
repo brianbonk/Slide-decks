@@ -198,7 +198,7 @@ GO
 DBCC SHOW_STATISTICS(newmember, nameindex);
 ```
 
-Look at the plans
+Look at the plans from the Estimatet Executionplan option in SSMS.
 
 ```sql
 SELECT * FROM newmember
@@ -222,7 +222,7 @@ DBCC SHOW_STATISTICS(newmember, nameindex);
 GO
 ```
 
-Look at the plans
+Look at the plans again from the Estimatet Executionplan option in SSMS.
 
 ```sql
 SELECT * FROM newmember

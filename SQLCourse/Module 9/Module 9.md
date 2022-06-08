@@ -93,7 +93,7 @@ USE AdventureWorks2012;
 GO
 ```
 
-Object Plan Guide
+### Object Plan Guide
 
 For plan to be optimized for a particular parameter
 
