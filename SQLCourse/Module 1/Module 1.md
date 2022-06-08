@@ -394,11 +394,11 @@ top 50 statements by Avg CPU Time
 
 ```sql
 SELECT TOP 50
-  qs.total_worker_time/qs.execution_count	AS [Avg CPU Time],
+  qs.total_worker_time/qs.execution_count AS [Avg CPU Time],
   SUBSTRING(qt.text,qs.statement_start_offset/2, 
 	 (CASE WHEN qs.statement_end_offset = -1 
 	   THEN len(convert(nvarchar(max), qt.text)) * 2 
-		ELSE qs.statement_end_offset END -       qs.statement_start_offset)/2) 
+		ELSE qs.statement_end_offset END - qs.statement_start_offset)/2) 
 		AS query_text,
 		qt.dbid, qt.objectid 
 FROM sys.dm_exec_query_stats qs
