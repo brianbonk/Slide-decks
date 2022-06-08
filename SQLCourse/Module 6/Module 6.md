@@ -260,7 +260,7 @@ Clear the cache
 DBCC FREEPROCCACHE
 ```
 
-Look at plan
+Look at the Estimatet Executionplan thorugh SSMS, do so without executing the actual below query.
 
 ```sql
 SELECT * FROM charge2
