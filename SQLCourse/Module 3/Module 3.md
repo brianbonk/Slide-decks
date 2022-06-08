@@ -74,6 +74,9 @@ GO
 ```
 
 ```sql
+Use TWO_LOGS;
+GO
+
 TRUNCATE TABLE sp_LOGINFO;
 INSERT INTO sp_LOGINFO
    EXEC ('DBCC LOGINFO');
@@ -81,7 +84,6 @@ GO
 ```
 
 Examine the VLFs in usage (FSeqNo) order
-
 
 Unused VLFs have a Status of 0, so the CASE forces those to the end
 
