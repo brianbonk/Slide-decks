@@ -115,6 +115,8 @@ SELECT * FROM sp_cacheobjects;
 GO
 
 -- Rerun above examples with new 2008 option enabled
+use master;
+goGO
 EXEC sp_configure 'Optimize for Ad hoc workloads', 1; RECONFIGURE;
 GO
 
@@ -126,6 +128,9 @@ GO
 --------------------------------------
 DBCC FREEPROCCACHE;
 GO
+
+USE AdventureWorks2012;
+GO;
 
 -- Why is this NOT an adhoc query?
 SELECT * FROM dbo.newsales
