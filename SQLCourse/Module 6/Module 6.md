@@ -51,6 +51,90 @@ AS
 ```
 
 
+```sql
+
+USE AdventureWorks2012;
+GO
+
+IF object_id('newsales') IS NOT NULL
+	DROP TABLE newsales;
+GO
+-- Make a copy of the Sales.SalesOrderHeader table
+SELECT * INTO dbo.newsales
+FROM Sales.SalesOrderHeader;
+GO
+UPDATE dbo.newsales
+SET SubTotal = cast(cast(SubTotal as int) as money);
+GO
+CREATE UNIQUE index newsales_ident 
+	ON newsales(SalesOrderID);
+GO
+CREATE INDEX IX_Sales_SubTotal on newsales(SubTotal);
+GO
+
+-- Adhoc query plan reuse
+
+DBCC FREEPROCCACHE;
+GO
+
+SELECT * FROM sp_cacheobjects;
+GO
+
+-- adhoc query
+SELECT * FROM dbo.newsales
+WHERE SubTotal = 4;
+GO
+
+SELECT * FROM sp_cacheobjects;
+GO
+
+-- adhoc query; a different plan is used
+SELECT * FROM dbo.newsales
+WHERE SubTotal = 5;
+GO
+
+SELECT * FROM sp_cacheobjects;
+GO
+
+-- adhoc queries must be textually EXACT to reuse plan
+-- without the comment it's a different query
+-- Include this comment when running the query
+SELECT * FROM dbo.newsales
+WHERE SubTotal = 4;
+GO
+
+SELECT * FROM sp_cacheobjects;
+GO
+
+-- This time the query has all lower case keywords
+select * from dbo.newsales
+where SubTotal = 4;
+GO
+
+SELECT * FROM sp_cacheobjects;
+GO
+
+-- Rerun above examples with new 2008 option enabled
+EXEC sp_configure 'Optimize for Ad hoc workloads', 1; RECONFIGURE;
+GO
+
+EXEC sp_configure 'Optimize for Ad hoc workloads', 0; RECONFIGURE; 
+GO
+
+
+
+--------------------------------------
+DBCC FREEPROCCACHE;
+GO
+
+-- Why is this NOT an adhoc query?
+SELECT * FROM dbo.newsales
+where SalesOrderID = 55555;
+GO
+SELECT * FROM sp_cacheobjects;
+GO
+```
+
 
 Take the query previous and make a stored procedure
 
