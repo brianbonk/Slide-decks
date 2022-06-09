@@ -4,7 +4,7 @@
 
 ### SETUP install sp_cacheobjects
 
-Create a view to show most of the same information as SQL Server 2000's syscacheobjects
+Create a view to show most of the same information as SQL Server's syscacheobjects
 
 ```sql
 USE master
