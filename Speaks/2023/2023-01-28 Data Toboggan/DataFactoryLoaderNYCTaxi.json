@@ -1,0 +1,209 @@
+{
+    "name": "NYC Taxi Parquet",
+    "properties": {
+        "activities": [
+            {
+                "name": "Get filelist for NYC parquet",
+                "type": "Lookup",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "AzureSqlSource",
+                        "sqlReaderQuery": "\nwith cte as (\nselect \nrow_number() over (order by (select 1)) as ints\nFROM\n    (values(null),(null),(null),(null),(null),(null),(null),(null),(null),(null),\n    (null),(null),(null),(null),(null),(null),(null),(null),(null),(null),(null),\n    (null),(null),(null),(null),(null),(null),(null),(null),(null),(null),(null),\n    (null),(null),(null),(null),(null),(null),(null),(null),(null),(null),(null),\n    (null),(null),(null),(null),(null),(null),(null),(null),(null),(null),(null)) a(ints)\n)\n\nselect \n concat('https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_',2008 + cte1.ints,'-',right(concat(0,cte2.ints),2),'.parquet') as http\n ,concat('yellow_tripdata_',2008 + cte1.ints,'-',right(concat(0,cte2.ints),2),'.parquet') as filename\nfrom cte as cte1, cte as cte2\nwhere 1=1\n    and 2008 + cte1.ints <= year(getdate())\n    and cte2.ints <= 12\n    and cast(concat(2008 + cte1.ints,cte2.ints) as int) < cast(concat(year(getdate()),month(getdate())-2) as int)",
+                        "queryTimeout": "02:00:00",
+                        "partitionOption": "None"
+                    },
+                    "dataset": {
+                        "referenceName": "DataCoffee",
+                        "type": "DatasetReference"
+                    },
+                    "firstRowOnly": false
+                }
+            },
+            {
+                "name": "For each file parquet",
+                "type": "ForEach",
+                "dependsOn": [
+                    {
+                        "activity": "Get filelist for NYC parquet",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('Get filelist for NYC parquet').output.value",
+                        "type": "Expression"
+                    },
+                    "activities": [
+                        {
+                            "name": "Copy NYC Taxi",
+                            "type": "Copy",
+                            "dependsOn": [],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "ParquetSource",
+                                    "storeSettings": {
+                                        "type": "HttpReadSettings",
+                                        "requestMethod": "GET"
+                                    }
+                                },
+                                "sink": {
+                                    "type": "ParquetSink",
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSWriteSettings"
+                                    },
+                                    "formatSettings": {
+                                        "type": "ParquetWriteSettings"
+                                    }
+                                },
+                                "enableStaging": false,
+                                "translator": {
+                                    "type": "TabularTranslator",
+                                    "typeConversion": true,
+                                    "typeConversionSettings": {
+                                        "allowDataTruncation": true,
+                                        "treatBooleanAsNumber": false
+                                    }
+                                }
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "NYCTaxi",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "RelativeURL": {
+                                            "value": "@item().filename",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "NYCTaxiParquet",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "filename": {
+                                            "value": "@item().filename",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "For each file CSV",
+                "type": "ForEach",
+                "dependsOn": [
+                    {
+                        "activity": "For each file parquet",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('Get filelist for NYC parquet').output.value",
+                        "type": "Expression"
+                    },
+                    "activities": [
+                        {
+                            "name": "Create CSV from parquet",
+                            "type": "Copy",
+                            "dependsOn": [],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "ParquetSource",
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSReadSettings",
+                                        "recursive": true,
+                                        "enablePartitionDiscovery": false
+                                    }
+                                },
+                                "sink": {
+                                    "type": "DelimitedTextSink",
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSWriteSettings"
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextWriteSettings",
+                                        "quoteAllText": true,
+                                        "fileExtension": ".txt"
+                                    }
+                                },
+                                "enableStaging": false,
+                                "translator": {
+                                    "type": "TabularTranslator",
+                                    "typeConversion": true,
+                                    "typeConversionSettings": {
+                                        "allowDataTruncation": true,
+                                        "treatBooleanAsNumber": false
+                                    }
+                                }
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "NYCTaxiParquet",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "filename": {
+                                            "value": "@item().filename",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "NYCTaxiCSV",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "FilenameCSV": {
+                                            "value": "@replace(item().filename, '.parquet','.csv')",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "annotations": [],
+        "lastPublishTime": "2022-11-19T21:35:51Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}
