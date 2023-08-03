@@ -1,0 +1,10 @@
+.create-or-alter function GetSysLogs(TimeWindow:string , Bucket:string )
+{
+cluster('help').database('SampleLogs').RawSysLogs
+| where timestamp > ago(totimespan(TimeWindow))
+| summarize LogCount=count() by name, bin(timestamp, totimespan(Bucket))
+| order by timestamp asc
+}
+
+
+GetSysLogs('5d','1h')
