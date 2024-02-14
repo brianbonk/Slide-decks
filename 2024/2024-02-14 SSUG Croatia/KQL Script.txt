@@ -2,8 +2,8 @@ KQL Script - ingest data
 
 .execute database script <|
 .create table KuandaLogs (Timestamp:datetime, DetectiveId:string, Message:string)
-.ingest async into table KuandaLogs (@'https://kustodetectiveagency.blob.core.windows.net/kda2c10adminlogs/log_00000.csv.gz’)
-.ingest async into table KuandaLogs (@'https://kustodetectiveagency.blob.core.windows.net/kda2c10adminlogs/log_00001.csv.gz’)
+.ingest async into table KuandaLogs (@'https://kustodetectiveagency.blob.core.windows.net/kda2c10adminlogs/log_00000.csv.gz')
+.ingest async into table KuandaLogs (@'https://kustodetectiveagency.blob.core.windows.net/kda2c10adminlogs/log_00001.csv.gz')
 .ingest into table KuandaLogs (@'https://kustodetectiveagency.blob.core.windows.net/kda2c10adminlogs/log_00002.csv.gz')
 
 
