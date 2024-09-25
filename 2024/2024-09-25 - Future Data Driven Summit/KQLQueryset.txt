@@ -1,0 +1,193 @@
+//adds a hidden field showing ingestion time
+.alter table Bicycles policy ingestiontime true
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// show ingestion time
+Bicycles
+| extend ingestion_time()
+| take 1000
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//SILVER LAYER
+// create new table to hold the silver layer data
+.create table [SilverBicycle] (
+    BikePointID:string
+    ,Street:string
+    ,Neighbourhood:string
+    ,Latitude:dynamic
+    ,Longitude:dynamic
+    ,No_Bikes:long
+    ,No_Empty_docks:long
+    ,IngestionDate: datetime
+)
+
+//adds a hidden field showing ingestion time
+.alter table SilverBicycle policy ingestiontime true
+
+
+
+
+
+
+
+
+
+
+
+
+
+// use update policies to transform data during Ingestion
+.create function ifnotexists with (docstring = 'Add ingestion time to raw data') ParseBicycles (){
+Bicycles
+| extend IngestionDate = ingestion_time() 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+// add update policy to the SilverTable
+.alter table SilverBicycle policy update @'[{"Source": "Bicycles", "Query": "ParseBicycles", "IsEnabled" : true, "IsTransactional": true }]'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// show data in the SilverLayer
+SilverBicycle
+| extend ingestion_time(), TimeFromRawToSilver = datetime_diff('millisecond', ingestion_time(), IngestionDate)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//GOLD LAYER
+// use materialized views to view the latest changes in the SilverBicycle table
+.create materialized-view with (backfill=true) GoldBicycle on table SilverBicycle
+{
+    SilverBicycle
+    | summarize arg_max(IngestionDate, *) by BikePointID
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//change batching policy time to 10 seconds to reflect ingestion changes faster
+.alter tables (Bicycles, SilverBicycle) policy ingestionbatching
+```
+{
+    "MaximumBatchingTimeSpan" : "00:00:10",
+    "MaximumNumberOfItems" : 20,
+    "MaximumRawDataSizeMB": 300
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// clean up
+.drop function ParseBicycles
+
+.drop materialized-view GoldBicycle
+
+.drop table Bicycles
+
+.drop table SilverBicycle
